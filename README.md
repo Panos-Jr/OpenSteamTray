@@ -63,7 +63,7 @@ When you're using the Steam app, click on a game in the Steam Store and a pop-up
 
 ## 5. Apply manually
 
-If a game is excluded, or the game is delisted and you can't access it, you can apply it manually using the option below. You'll just need the Steam App ID of the game:
+If a game is excluded, or the game is delisted and you can't access it in the Steam Store, you can apply it manually using the option below. You'll just need the App ID of the game:
 
 <br>
 
