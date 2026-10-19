@@ -20,6 +20,11 @@ Extract `OpenSteamTray.zip` from [Releases](https://github.com/Panos-Jr/OpenStea
 
 <img width="218" height="140" alt="image" src="https://github.com/user-attachments/assets/2da5b5f4-e6b1-4444-a1f1-54cef7e2aa63" />
 
+Make sure to set the tool you will be using here,
+
+<img width="524" height="409" alt="image" src="https://github.com/user-attachments/assets/1164acae-b28c-4152-b1ce-fde6f9b8e814" />
+
+
 When you're using Steam app, you can click on a game, in the Steam Store, and a pop-up should appear, asking if you want to add the manifest files for the game. This is timed, so you'll have to decide in the time limit, 
 otherwise game will be excluded.
 
