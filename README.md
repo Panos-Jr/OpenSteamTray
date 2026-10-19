@@ -3,7 +3,9 @@
 # Setup
 
 **Requirements**: You'll need either SteamTools, or OpenSteamTool installed, for this to work.
+
 https://steamtools.net - SteamTools
+
 https://github.com/PandaQuQ/OpenSteamTool/releases - OpenSteamTool (this is a working fork, as the original has not been updated yet to address recent issues)
 
 Extract `OpenSteamTray.zip` from [Releases](https://github.com/Panos-Jr/OpenSteamTray/releases) and run `setup.bat`, then you can run OpenSteamTray.exe, it should show up on your Windows Tray.
