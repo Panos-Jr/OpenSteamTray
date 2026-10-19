@@ -10,6 +10,8 @@ https://steamtools.net - SteamTools
 
 https://github.com/PandaQuQ/OpenSteamTool/releases - OpenSteamTool (this is a working fork, as the original has not been updated yet to address recent issues)
 
+Hubcaps Manifest API KEY - https://hubcapmanifest.com/api-keys/stats (the app should let you know if your key expires or is invalid regardless, you can set the key in options)
+
 # Setup
 
 Extract `OpenSteamTray.zip` from [Releases](https://github.com/Panos-Jr/OpenSteamTray/releases) and run `setup.bat`, then you can run OpenSteamTray.exe, it should show up on your Windows Tray.
