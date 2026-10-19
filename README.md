@@ -11,7 +11,8 @@ https://steamtools.net - SteamTools
 https://github.com/PandaQuQ/OpenSteamTool/releases - OpenSteamTool (this is a working fork, as the original has not been updated yet to address recent issues)
 
 Hubcaps Manifest API key - https://hubcapmanifest.com/api-keys/stats (the app should let you know if your key expires or is invalid regardless, you can set the key in options)
-Note: if you have used `apply manifest` feature in [**SteamLookup**](https://github.com/Panos-Jr/SteamLookup), you shouldn't need to set the API key on OpenSteamTray, as they use the same json files for it
+
+**Note**: if you have used `apply manifest` feature in [**SteamLookup**](https://github.com/Panos-Jr/SteamLookup), you shouldn't need to set the API key on OpenSteamTray, as they use the same json files for it
 
 # Setup
 
