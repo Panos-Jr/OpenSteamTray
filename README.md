@@ -1,4 +1,4 @@
-<img width="512" height="512" alt="app" src="https://github.com/user-attachments/assets/60403a30-b3ff-47df-9b82-2ec8779bfe35" />
+<img width="256" height="256" alt="app" src="https://github.com/user-attachments/assets/60403a30-b3ff-47df-9b82-2ec8779bfe35" />
 
 # Setup
 Extract `OpenSteamTray.zip` from Releases and run `setup.bat` and then you can run OpenSteamTray.exe, it should show up on your Windows Tray.
