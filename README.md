@@ -1,6 +1,11 @@
 <img width="128" height="128" alt="app" src="https://github.com/user-attachments/assets/60403a30-b3ff-47df-9b82-2ec8779bfe35" />
 
 # Setup
+
+**Requirements**: You'll need either SteamTools, or OpenSteamTool installed, for this to work.
+https://steamtools.net - SteamTools
+https://github.com/PandaQuQ/OpenSteamTool/releases - OpenSteamTool (this is a working fork, as the original has not been updated yet to address recent issues)
+
 Extract `OpenSteamTray.zip` from [Releases](https://github.com/Panos-Jr/OpenSteamTray/releases) and run `setup.bat`, then you can run OpenSteamTray.exe, it should show up on your Windows Tray.
 
 <img width="218" height="140" alt="image" src="https://github.com/user-attachments/assets/2da5b5f4-e6b1-4444-a1f1-54cef7e2aa63" />
