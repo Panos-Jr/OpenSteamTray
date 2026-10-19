@@ -1,5 +1,10 @@
 <img width="128" height="128" alt="app" src="https://github.com/user-attachments/assets/60403a30-b3ff-47df-9b82-2ec8779bfe35" />
 
 # Setup
-Extract `OpenSteamTray.zip` from [Releases](https://github.com/Panos-Jr/OpenSteamTray/releases) and run `setup.bat` and then you can run OpenSteamTray.exe, it should show up on your Windows Tray.
+Extract `OpenSteamTray.zip` from [Releases](https://github.com/Panos-Jr/OpenSteamTray/releases) and run `setup.bat`, then you can run OpenSteamTray.exe, it should show up on your Windows Tray.
+
+<img width="218" height="140" alt="image" src="https://github.com/user-attachments/assets/2da5b5f4-e6b1-4444-a1f1-54cef7e2aa63" />
+
 When you're using Steam app, you can click on a game, in the Steam Store, and a pop-up should appear, asking if you want to add the manifest files for the game.
+
+<img width="340" height="258" alt="image" src="https://github.com/user-attachments/assets/c010426d-0eb2-43a8-8624-113129d13c05" />
