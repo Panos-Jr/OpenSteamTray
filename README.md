@@ -16,7 +16,7 @@ Hubcaps Manifest API key - https://hubcapmanifest.com/api-keys/stats (the app sh
 
 # Setup
 
-Extract `OpenSteamTray.zip` from [Releases](https://github.com/Panos-Jr/OpenSteamTray/releases) and run `setup.bat`, then you can run OpenSteamTray.exe, it should show up on your Windows Tray.
+Download and extract `OpenSteamTray.zip` from [Releases](https://github.com/Panos-Jr/OpenSteamTray/releases) and run `setup.bat`, then you can run OpenSteamTray.exe, it should show up on your Windows Tray.
 
 <img width="218" height="140" alt="image" src="https://github.com/user-attachments/assets/2da5b5f4-e6b1-4444-a1f1-54cef7e2aa63" />
 
