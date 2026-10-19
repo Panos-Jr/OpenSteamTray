@@ -24,6 +24,9 @@ Make sure to set the tool you will be using here,
 
 <img width="524" height="409" alt="image" src="https://github.com/user-attachments/assets/1164acae-b28c-4152-b1ce-fde6f9b8e814" />
 
+then double check, Steam Debugging is ON, if not, press **Enable** below it,
+<img width="228" height="48" alt="image" src="https://github.com/user-attachments/assets/ec8a2284-54ad-4c18-98e1-6e883ab9bee6" />
+
 
 When you're using Steam app, you can click on a game, in the Steam Store, and a pop-up should appear, asking if you want to add the manifest files for the game. This is timed, so you'll have to decide in the time limit, 
 if you press `Not now` the game will be excluded, and the pop-up will not show up for that specific game.
