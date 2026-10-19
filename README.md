@@ -24,6 +24,7 @@ Make sure to set the tool you will be using here,
 
 <img width="524" height="409" alt="image" src="https://github.com/user-attachments/assets/1164acae-b28c-4152-b1ce-fde6f9b8e814" />
 
+
 then double check, Steam Debugging is ON, if not, press **Enable** below it,
 <img width="228" height="48" alt="image" src="https://github.com/user-attachments/assets/ec8a2284-54ad-4c18-98e1-6e883ab9bee6" />
 
