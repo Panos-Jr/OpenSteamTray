@@ -55,7 +55,7 @@ class SteamTrayApp:
         self.root.after(200, self._ensure_monitor)
         self.root.after(150, self._process_events)
         self.root.after(500, lambda: self.events.put(("refresh_stats", None)))
-        self.root.after(STATS_REFRESH_MS, self._auto_refresh_stats)
+        # self.root.after(STATS_REFRESH_MS, self._auto_refresh_stats)
 
         self.root.mainloop()
 
@@ -410,19 +410,30 @@ class SteamTrayApp:
     # ------------------------------------------------------------------ stats
     def _refresh_stats_async(self):
         def worker():
-            stats, err = hubcap.get_hubcap_stats()
-            if err is not None:
-                self._notify("Update your API key", "Your api key may be expired/invalid")
-                import webbrowser
+            stats, err, status = hubcap.get_hubcap_stats()
 
-                webbrowser.open("https://hubcapmanifest.com/api-keys/stats")
+            if err is not None and status in (401, 403):
+                now = time.time()
+                if now - getattr(self, "_last_auth_warn", 0) > 3600:
+                    self._last_auth_warn = now
+                    self._notify(
+                        "Update your API key",
+                        "Your Hubcap API key may be expired or invalid.",
+                    )
+                    import webbrowser
+                    webbrowser.open("https://hubcapmanifest.com/api-keys/stats")
 
             self.events.put(("stats_loaded", (stats, err)))
+
         threading.Thread(target=worker, daemon=True, name="stats").start()
 
     def _on_stats_loaded(self, stats, error):
-        self.stats_cache = stats
-        self.stats_error = error
+        if stats is not None:
+            self.stats_cache = stats
+            self.stats_error = None
+        else:
+            if self.stats_cache is None:
+                self.stats_error = error
         self._rebuild_menu()
 
     def _do_show_stats(self):
@@ -463,6 +474,8 @@ class SteamTrayApp:
             self._notify("Hubcap key saved", "Refreshing stats\u2026")
             self._rebuild_menu()
             self._notify("Complete", "Stats refreshed successfully")
+            self.stats_cache = None
+            self.stats_error = None
             self.events.put(("refresh_stats", None))
         else:
             self._notify("Save failed", "Could not write the key file.")

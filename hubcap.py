@@ -50,11 +50,10 @@ def save_hubcap_key(key: str) -> bool:
         return False
 
 
-def get_hubcap_stats(api_key: Optional[str] = None) -> Tuple[Optional[dict], Optional[str]]:
-    """Returns (stats_dict, error_string). One of them is always None."""
+def get_hubcap_stats(api_key: Optional[str] = None) -> Tuple[Optional[dict], Optional[str], int]:
     api_key = api_key if api_key is not None else load_hubcap_key()
     if not api_key:
-        return None, "API key not set"
+        return None, "API key not set", 0
     try:
         resp = requests.get(
             f"{HUBCAP_API_BASE}/user/stats",
@@ -62,15 +61,13 @@ def get_hubcap_stats(api_key: Optional[str] = None) -> Tuple[Optional[dict], Opt
             timeout=10,
         )
         if resp.status_code == 200:
-            return resp.json(), None
-        
-        return None, f"HTTP {resp.status_code}"
+            return resp.json(), None, 200
+        return None, f"HTTP {resp.status_code}", resp.status_code
     except Exception as e:
-        return None, f"Request failed: {e}"
+        return None, f"Request failed: {e}", 0
 
 
 def format_stats(stats: Optional[dict]) -> str:
-    """Compact one-liner, e.g.  '5/50 today \u00b7 87d left'."""
     if not stats:
         return "n/a"
     parts = []
@@ -98,7 +95,6 @@ def format_stats(stats: Optional[dict]) -> str:
 
 
 def stats_detail_text(stats: Optional[dict], error: Optional[str]) -> str:
-    """Multi-line text for the details dialog."""
     if error:
         return f"\u274c {error}"
     if not stats:
@@ -124,9 +120,6 @@ def stats_detail_text(stats: Optional[dict], error: Optional[str]) -> str:
     ])
 
 
-# -----------------------------------------------------------------------------
-# Steam root lookup
-# -----------------------------------------------------------------------------
 def _find_steam_root() -> Optional[Path]:
     for p in _STEAM_CANDIDATES:
         if p.exists():
@@ -137,10 +130,6 @@ def _find_steam_root() -> Optional[Path]:
     except Exception:
         return None
 
-
-# -----------------------------------------------------------------------------
-# Manifest application
-# -----------------------------------------------------------------------------
 def apply_manifest(app_id: str, tool: str = "Steamtools",
                    api_key: Optional[str] = None) -> str:
     app_id = str(app_id)
@@ -208,10 +197,6 @@ def apply_manifest(app_id: str, tool: str = "Steamtools",
     except Exception as e:
         return f"\u274c Extraction failed: {e}"
 
-
-# -----------------------------------------------------------------------------
-# Steam restart helper
-# -----------------------------------------------------------------------------
 def is_steam_running() -> bool:
     try:
         out = subprocess.check_output(
