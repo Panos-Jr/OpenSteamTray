@@ -325,7 +325,6 @@ class SteamTrayApp:
         threading.Thread(target=worker, daemon=True,
                          name=f"apply-{app_id}").start()
 
-    # ------------------------------------------------------------------ remove
     def _do_remove_game(self, app_id: str, name: str):
         """Confirm and remove a single game's files."""
         try:
