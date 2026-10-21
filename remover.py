@@ -7,7 +7,6 @@ from steam_utils import find_steam_path
 
 
 def _get_paths(steam_folder: Path) -> dict:
-    """Same set of folders your Games Remover scans."""
     return {
         "stplugin":          steam_folder / "config" / "stplug-in",
         "config_depotcache": steam_folder / "config" / "depotcache",
@@ -21,10 +20,6 @@ def _get_paths(steam_folder: Path) -> dict:
 def remove_game(app_id: str,
                 steam_folder: Optional[Path] = None
                 ) -> Tuple[int, List[str]]:
-    """
-    Delete every file associated with app_id.
-    Returns (count_deleted, log_lines). Never raises.
-    """
     app_id = str(app_id).strip()
     if not app_id.isdigit() or len(app_id) < 2:
         return 0, [f"Invalid app ID: {app_id!r}"]
@@ -70,10 +65,6 @@ def remove_game(app_id: str,
 
 def remove_all_games(steam_folder: Optional[Path] = None
                      ) -> Tuple[int, List[str]]:
-    """
-    Delete every .st / .manifest / .bin file under the tracked folders.
-    Returns (count_deleted, log_lines). Never raises.
-    """
     steam_folder = steam_folder or find_steam_path()
     if not steam_folder:
         return 0, ["Steam installation not found."]
