@@ -21,7 +21,7 @@ A lightweight Windows tray app that adds games to your Steam library on the fly.
 You'll need a manifest source — **Hubcap** or **Ryuu**:
 
 - **Hubcap** — get an API key from [hubcapmanifest.com/api-keys/stats](https://hubcapmanifest.com/api-keys/stats). The app lets you know if your key expires or is invalid, and you can set it in the tray menu.
-- **Ryuu** — get an API key and set it via **Set Ryuu key…** in the tray menu. Ryuu doesn't require a key in the app for public branches if you don't have one, but it's recommended for reliability. Obtain one here [https://generator.ryuu.lol/api](https://generator.ryuu.lol/api)
+- **Ryuu** — get an API key and set it via **Set Ryuu key…** in the tray menu. Ryuu doesn't require a key in the app for public branches if you don't have one, but it's recommended for reliability. Obtain one hereL [generator.ryuu.lol/api](https://generator.ryuu.lol/api)
 
 > **Note:** If you've used the `apply manifest` feature in [**SteamLookup**](https://github.com/Panos-Jr/SteamLookup), you shouldn't need to set the Hubcap API key in OpenSteamTray — they use the same JSON files.
 
