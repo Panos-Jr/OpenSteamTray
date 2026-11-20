@@ -21,8 +21,8 @@ _STEAM_CANDIDATES = [
 ]
 
 _TOOL_PATHS = {
-    "Steamtools":     ("config", "stplug-in"),
-    "OpenSteamTools": ("config", "lua"),
+    "Steamtools":    ("config", "stplug-in"),
+    "OpenSteamTool": ("config", "lua"),
 }
 
 def load_hubcap_key() -> str:
