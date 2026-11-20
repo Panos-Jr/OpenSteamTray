@@ -18,8 +18,11 @@ DEFAULT_CONFIG = {
     "poll_interval": 1.0,
     "auto_dismiss_seconds": 15,
     "probe_interval_seconds": 5,
-    "tool": "Steamtools",            # or "OpenSteamTools"
+    "tool": "Steamtools",
     "auto_restart_steam": False,
+    "manifest_source": "hubcap",
+    "ryuu_api_key": "",
+    "fallback_enabled": False,
 }
 
 
