@@ -13,7 +13,7 @@ A lightweight Windows tray app that adds games to your Steam library on the fly.
 `setup.bat` currently installs **Ryuu's OpenSteamTool** by default, however these are alternatives which you may use:
 
 - [SteamTools](https://steamtools.net)
-- [OpenSteamTool](https://github.com/PandaQuQ/OpenSteamTool/releases)
+- [OpenSteamTool](https://github.com/PandaQuQ/OpenSteamTool/releases) (fork)
 
 # Requirements
 
