@@ -1,17 +1,26 @@
+# OpenSteamTray
+
 <img width="128" height="128" alt="app" src="https://github.com/user-attachments/assets/60403a30-b3ff-47df-9b82-2ec8779bfe35" />
+
+<br>
+
+A lightweight Windows tray app that adds games to your Steam library on the fly. Open a game's store page in Steam, and a pop-up asks if you want to apply the manifest files — no manual copying required.
 
 <br>
 
 # Requirements
 
-You'll need either SteamTools or OpenSteamTool installed for this to work.
+You'll need either **SteamTools** or **OpenSteamTool** installed for this to work.
 
 - [SteamTools](https://steamtools.net)
 - [OpenSteamTool](https://github.com/PandaQuQ/OpenSteamTool/releases) (this is a working fork, as the original has not been updated yet to address recent issues)
 
-You'll also need a [Hubcaps Manifest API key](https://hubcapmanifest.com/api-keys/stats). The app will let you know if your key expires or is invalid, and you can set the key in Options.
+You'll also need a manifest source — **Hubcap** or **Ryuu**:
 
-> **Note:** If you have used the `apply manifest` feature in [**SteamLookup**](https://github.com/Panos-Jr/SteamLookup), you shouldn't need to set the API key in OpenSteamTray, as they use the same JSON files.
+- **Hubcap** — get an API key from [hubcapmanifest.com/api-keys/stats](https://hubcapmanifest.com/api-keys/stats). The app lets you know if your key expires or is invalid, and you can set it in the tray menu.
+- **Ryuu** — get an API key and set it via **Set Ryuu key…** in the tray menu. Ryuu doesn't require a key in the app for public branches if you don't have one, but it's recommended for reliability.
+
+> **Note:** If you've used the `apply manifest` feature in [**SteamLookup**](https://github.com/Panos-Jr/SteamLookup), you shouldn't need to set the Hubcap API key in OpenSteamTray — they use the same JSON files.
 
 <br>
 
@@ -30,7 +39,11 @@ Download and extract `OpenSteamTray.zip` from [Releases](https://github.com/Pano
 
 ## 2. Choose your tool
 
-Make sure to set the tool you will be using here:
+Open the tray menu and pick the tool you'll be using under **Apply tool**:
+
+- **Steamtools** — writes to `config\stplug-in`
+- **OpenSteamTool** — writes to `config\lua`
+- **Ryuu OpenSteamTool** — always uses Ryuu as the source, writes to `config\lua`, and **skips the Steam restart prompt** (OpenSteamTool picks up changes live)
 
 <br>
 
@@ -39,9 +52,30 @@ Make sure to set the tool you will be using here:
 <br>
 <br>
 
-## 3. Enable Steam Debugging
+## 3. Pick a manifest source
 
-Double-check that Steam Debugging is **ON**. If not, press **Enable** below it:
+Under **Manifest source**, choose between:
+
+- **Hubcap** — uses your Hubcap API key
+- **Ryuu** — uses your Ryuu API key
+
+Selecting **Ryuu OpenSteamTool** as the tool overrides this and always uses Ryuu.
+
+<br>
+
+## 4. (Optional) Turn on Fallback
+
+If the current tool + source combo fails (game not found, API error, etc.), Fallback tries the other combination automatically — then returns to your original selection. Toggle it from the tray menu:
+
+**Fallback on failure: ON / OFF**
+
+Useful if a game exists on one source but not the other.
+
+<br>
+
+## 5. Enable Steam Debugging
+
+Double-check that **Steam debugging** is **ON** in the tray menu. If not, press **Enable Steam debugging** below it. Steam must be running for the monitor to work.
 
 <br>
 
@@ -50,9 +84,9 @@ Double-check that Steam Debugging is **ON**. If not, press **Enable** below it:
 <br>
 <br>
 
-## 4. Use it in the Steam Store
+## 6. Use it in the Steam Store
 
-When you're using the Steam app, click on a game in the Steam Store and a pop-up should appear, asking if you want to add the manifest files for the game. This is timed, so you'll have to decide within the time limit. If you press `Not now`, the game will be excluded and the pop-up will not show up for that specific game.
+When you're using the Steam app, click on a game in the Steam Store and a pop-up should appear, asking if you want to add the manifest files for the game. This is timed, so you'll have to decide within the limit. If you press `Not now`, the game is excluded and the pop-up won't show up for that specific game again.
 
 <br>
 
@@ -61,10 +95,41 @@ When you're using the Steam app, click on a game in the Steam Store and a pop-up
 <br>
 <br>
 
-## 5. Apply manually
+## 7. Apply manually
 
-If a game is excluded, or the game is delisted and you can't access it in the Steam Store, you can apply it manually using the option below. You'll just need the App ID of the game:
+If a game is excluded, or the game is delisted and you can't access it in the Steam Store, you can apply it manually using **Apply manifest by App ID…**. You'll just need the App ID of the game:
 
 <br>
 
 <img width="266" height="346" alt="image" src="https://github.com/user-attachments/assets/ed8ff9ce-24a5-4352-b139-542439d89b19" />
+
+<br>
+<br>
+
+# Menu reference
+
+| Item | What it does |
+| :--- | :--- |
+| **Steam debugging: ON/OFF** | Shows whether Steam's CEF debugging port is reachable |
+| **Enable Steam debugging** | Creates the marker file; restart Steam to take effect |
+| **Manifest source** | Switch between **Hubcap** and **Ryuu** |
+| **Fallback on failure: ON/OFF** | Retry with the other tool/source if the first attempt fails |
+| **Hubcap: …** | Live stats (daily usage, key expiry) — click for details |
+| **Set Hubcap key…** | Store your Hubcap API key |
+| **Set Ryuu key…** | Store your Ryuu API key (saved to `config.json`) |
+| **Refresh stats** | Manually refresh Hubcap stats |
+| **Apply tool** | Pick Steamtools / OpenSteamTool / Ryuu OpenSteamTool |
+| **Apply manifest by App ID…** | Manually apply a game by ID |
+| **Applied** | List of games already applied — click one to remove it |
+| **Remove game by App ID…** | Remove a single game's files |
+| **Remove ALL games…** | Wipe all tracked manifest/lua files |
+| **Open data folder** | Opens the app's data folder |
+| **Quit** | Exit the tray app |
+
+<br>
+
+# Notes
+
+- **No restart needed** when using **Ryuu OpenSteamTool** — OpenSteamTool reloads `.lua` files live.
+- With Hubcap or Steamtools, Steam must be restarted for the new game to appear (the app will prompt, or you can enable auto-restart).
+- If a Ryuu download returns 404, the app automatically fires `/requestupdate` and `/request` for that App ID, waits a few seconds, and retries once. Some games may need a minute before they're available.
