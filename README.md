@@ -105,7 +105,8 @@ If a game is excluded, or the game is delisted and you can't access it in the St
 
 <br>
 
-<img width="266" height="346" alt="image" src="https://github.com/user-attachments/assets/ed8ff9ce-24a5-4352-b139-542439d89b19" />
+<img width="238" height="397" alt="image" src="https://github.com/user-attachments/assets/8b5ccd3e-f7e5-4dc1-bf28-b30da29ca51b" />
+
 
 <br>
 <br>
