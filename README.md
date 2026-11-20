@@ -8,14 +8,17 @@ A lightweight Windows tray app that adds games to your Steam library on the fly.
 
 <br>
 
-# Requirements
+# Note
 
-You'll need either **SteamTools** or **OpenSteamTool** installed for this to work.
+`setup.bat` currently installs **Ryuu's OpenSteamTool** by default, however these are alternatives which you may use:
 
 - [SteamTools](https://steamtools.net)
 - [OpenSteamTool](https://github.com/PandaQuQ/OpenSteamTool/releases) (this is a working fork, as the original has not been updated yet to address recent issues)
 
-You'll also need a manifest source — **Hubcap** or **Ryuu**:
+# Requirements
+
+
+You'll need a manifest source — **Hubcap** or **Ryuu**:
 
 - **Hubcap** — get an API key from [hubcapmanifest.com/api-keys/stats](https://hubcapmanifest.com/api-keys/stats). The app lets you know if your key expires or is invalid, and you can set it in the tray menu.
 - **Ryuu** — get an API key and set it via **Set Ryuu key…** in the tray menu. Ryuu doesn't require a key in the app for public branches if you don't have one, but it's recommended for reliability.
