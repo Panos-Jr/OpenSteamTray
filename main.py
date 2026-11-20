@@ -1,5 +1,6 @@
 import queue
 import threading
+import time
 import tkinter as tk
 from tkinter import messagebox, simpledialog
 import os
@@ -8,6 +9,7 @@ from pystray import Menu, MenuItem as Item
 
 import hubcap
 import remover
+import ryuu
 from config import APP_NAME, CONFIG_DIR, load_config, save_config
 from library import Library
 from steam_cef import CefMonitor, StorePage, fetch_app_name
@@ -22,7 +24,20 @@ from steam_utils import (
 from ui import ConfirmDialog, make_tray_image
 
 
-STATS_REFRESH_MS = 5 * 60 * 1000   # auto-refresh API_KEY stats every 5 minutes
+STATS_REFRESH_MS = 5 * 60 * 1000
+
+APPLY_TOOLS = ("Steamtools", "OpenSteamTool", "Ryuu OpenSteamTool")
+
+_NO_RESTART_TOOLS = {"Ryuu OpenSteamTool"}
+
+_FALLBACK_MAP = {
+    ("Steamtools", "hubcap"):        ("Ryuu OpenSteamTool", "ryuu"),
+    ("OpenSteamTool", "hubcap"):     ("Ryuu OpenSteamTool", "ryuu"),
+    ("Steamtools", "ryuu"):          ("OpenSteamTool", "hubcap"),
+    ("OpenSteamTool", "ryuu"):       ("Steamtools", "hubcap"),
+    ("Ryuu OpenSteamTool", "ryuu"):  ("OpenSteamTool", "hubcap"),
+    ("Ryuu OpenSteamTool", "hubcap"): ("OpenSteamTool", "hubcap"),
+}
 
 
 class SteamTrayApp:
@@ -55,17 +70,54 @@ class SteamTrayApp:
         self.root.after(200, self._ensure_monitor)
         self.root.after(150, self._process_events)
         self.root.after(500, lambda: self.events.put(("refresh_stats", None)))
-        # self.root.after(STATS_REFRESH_MS, self._auto_refresh_stats)
 
         self.root.mainloop()
 
-    def _auto_refresh_stats(self):
-        self.events.put(("refresh_stats", None))
-        if self.root:
-            self.root.after(STATS_REFRESH_MS, self._auto_refresh_stats)
+    def _source(self) -> str:
+        return self.cfg.get("manifest_source", "hubcap")
 
-    # menu
+    def _apply_manifest_for(self, app_id: str, tool: str,
+                            source: str | None = None) -> str:
+        src = source if source is not None else self._source()
+        if tool == "Ryuu OpenSteamTool":
+            return ryuu.apply_manifest(app_id, tool=tool)
+        if src == "ryuu":
+            return ryuu.apply_manifest(app_id, tool=tool)
+        return hubcap.apply_manifest(app_id, tool=tool)
+
+    def _apply_with_fallback(self, app_id: str, tool: str):
+        """Try current (tool, source). If fallback is enabled and it fails,
+        retry with the mapped fallback tool/source once.
+
+        Returns (result_text, ok).
+        """
+        result = self._apply_manifest_for(app_id, tool)
+        if result.startswith("\u2705"):
+            return result, True
+
+        if not self.cfg.get("fallback_enabled", False):
+            return result, False
+
+        key = (tool, "ryuu" if tool == "Ryuu OpenSteamTool" else self._source())
+        fb = _FALLBACK_MAP.get(key)
+        if not fb:
+            return result, False
+        fb_tool, fb_source = fb
+
+        print(f"[fallback] {key[0]}/{key[1]} failed, trying {fb_tool}/{fb_source}")
+        fb_result = self._apply_manifest_for(app_id, fb_tool, source=fb_source)
+
+        if fb_result.startswith("\u2705"):
+            return (f"{result}\n\n"
+                    f"\u21aa Fallback ({fb_tool} / {fb_source}) succeeded:\n"
+                    f"{fb_result}", True)
+        return (f"{result}\n\n"
+                f"\u21aa Fallback ({fb_tool} / {fb_source}) also failed:\n"
+                f"{fb_result}", False)
+
     def _stats_label(self) -> str:
+        if self._source() == "ryuu":
+            return "Ryuu: ready" if ryuu.load_ryuu_key() else "Ryuu: key not set"
         if self.stats_error:
             return f"Hubcap: {self.stats_error[:40]}"
         if self.stats_cache is None:
@@ -83,6 +135,14 @@ class SteamTrayApp:
                 return self.cfg["tool"] == tool_name
             return is_checked
 
+        def make_source_checked(src: str):
+            def is_checked(item):
+                return self._source() == src
+            return is_checked
+
+        def make_fallback_checked(item):
+            return bool(self.cfg.get("fallback_enabled", False))
+
         def act_show_stats(icon, item):
             self.events.put(("show_stats", None))
 
@@ -98,12 +158,20 @@ class SteamTrayApp:
         def act_remove_all(icon, item):
             self.events.put(("remove_all", None))
 
-        # submenus
         tool_items = [
             Item(name, self._set_tool,
                  checked=make_tool_checked(name),
                  radio=True)
-            for name in ("Steamtools", "OpenSteamTools")
+            for name in APPLY_TOOLS
+        ]
+
+        source_items = [
+            Item("Hubcap", self._set_source,
+                 checked=make_source_checked("hubcap"),
+                 radio=True),
+            Item("Ryuu", self._set_source,
+                 checked=make_source_checked("ryuu"),
+                 radio=True),
         ]
 
         rows = self.lib.all()[:20]
@@ -115,24 +183,26 @@ class SteamTrayApp:
         else:
             lib_items = [Item("(empty)", None, enabled=False)]
 
+        fallback_on = self.cfg.get("fallback_enabled", False)
+
         return Menu(
             Item(f"Steam debugging: {'ON' if self.cef_status else 'OFF'}",
                  None, enabled=False),
             Item("Enable Steam debugging", self._enable_debugging),
             Item("Dump CEF targets", self._dump_targets),
-            Menu.SEPARATOR,
+            Item("Manifest source", Menu(*source_items)),
+            Item(f"Fallback on failure: {'ON' if fallback_on else 'OFF'}",
+                 self._toggle_fallback,
+                 checked=make_fallback_checked),
             Item(self._stats_label(), act_show_stats),
-            Item("Refresh stats", act_refresh_stats),
             Item("Set Hubcap key\u2026", lambda: self.root.after(0, lambda: self._set_hubcap_key())),
+            Item("Set Ryuu key\u2026", lambda: self.root.after(0, lambda: self._set_ryuu_key())),
+            Item("Refresh stats", act_refresh_stats),
             Item("Apply tool", Menu(*tool_items)),
             Item("Apply manifest by App ID\u2026", act_apply_by_id),
-            Menu.SEPARATOR,
-            Item("Applied", Menu(*lib_items)),
             Item("Remove game by App ID\u2026", act_remove_by_id),
             Item("Remove ALL games\u2026", act_remove_all),
-            Menu.SEPARATOR,
             Item("Open data folder", self._open_data_folder),
-            Menu.SEPARATOR,
             Item("Quit", self._quit),
         )
 
@@ -201,7 +271,6 @@ class SteamTrayApp:
         if self.root:
             self.root.after(150, self._process_events)
 
-    # store-page prompt, check if excluded by user before
     def _handle_store_page(self, page: StorePage):
         if self.lib.has(page.app_id) or self.lib.is_dismissed(page.app_id):
             return
@@ -234,29 +303,31 @@ class SteamTrayApp:
         tool = self.cfg["tool"]
         self.lib.add(page.app_id, name, page.url)
         self._rebuild_menu()
-        self._notify("Applying manifest", f"{name} ({page.app_id}) \u2192 {tool}")
+        self._notify("Applying manifest",
+                     f"{name} ({page.app_id}) \u2192 {tool}")
 
         def worker():
-            result = hubcap.apply_manifest(page.app_id, tool=tool)
-            self.events.put(("apply_result", (name, result)))
+            result, ok = self._apply_with_fallback(page.app_id, tool)
+            self.events.put(("apply_result", (name, result, ok)))
 
         threading.Thread(target=worker, daemon=True,
                          name=f"apply-{page.app_id}").start()
 
-    def _handle_apply_result(self, name: str, result: str):
-        ok = result.startswith("\u2705")
+    def _handle_apply_result(self, name: str, result: str, ok: bool):
         title = "Manifest applied" if ok else "Manifest failed"
         print(f"[apply] {title}: {name}\n{result}")
 
-        # Tray notification only
-        self._notify(
-            title,
-            f"{name} \u2014 {result.splitlines()[0][:120]}",
-        )
+        first_line = result.splitlines()[0][:120] if result else ""
+        self._notify(title, f"{name} \u2014 {first_line}")
 
         self.events.put(("refresh_stats", None))
 
         if not ok:
+            return
+
+        # Ryuu OpenSteamTool is a "live" tool — no restart prompt
+        if self.cfg.get("tool") in _NO_RESTART_TOOLS:
+            print("[restart] skipped (Ryuu OpenSteamTool)")
             return
 
         if self.cfg.get("auto_restart_steam", False):
@@ -288,7 +359,7 @@ class SteamTrayApp:
 
         threading.Thread(target=worker, daemon=True,
                          name="restart-steam").start()
-        
+
     def _handle_restart_done(self, msg: str):
         print(f"[restart] {msg}")
         if self.icon:
@@ -298,7 +369,6 @@ class SteamTrayApp:
                 pass
 
     def _do_apply_by_id(self):
-        #done manually by app_id if excluded, or is a delisted game
         try:
             raw = simpledialog.askstring(
                 "Apply manifest",
@@ -318,16 +388,16 @@ class SteamTrayApp:
         self.lib.add(app_id, name, f"https://store.steampowered.com/app/{app_id}")
         self._rebuild_menu()
 
+        tool = self.cfg["tool"]
+
         def worker():
-            result = hubcap.apply_manifest(app_id, tool=self.cfg["tool"])
-            self.events.put(("apply_result", (name, result)))
+            result, ok = self._apply_with_fallback(app_id, tool)
+            self.events.put(("apply_result", (name, result, ok)))
 
         threading.Thread(target=worker, daemon=True,
                          name=f"apply-{app_id}").start()
 
-    # ------------------------------------------------------------------ remove
     def _do_remove_game(self, app_id: str, name: str):
-        """Confirm and remove a single game's files."""
         try:
             ok = messagebox.askyesno(
                 "Remove game",
@@ -407,7 +477,6 @@ class SteamTrayApp:
         except tk.TclError:
             pass
 
-    # ------------------------------------------------------------------ stats
     def _refresh_stats_async(self):
         def worker():
             stats, err, status = hubcap.get_hubcap_stats()
@@ -437,21 +506,49 @@ class SteamTrayApp:
         self._rebuild_menu()
 
     def _do_show_stats(self):
-        if self.stats_error:
+        if self._source() == "ryuu":
+            key = ryuu.load_ryuu_key()
+            text = (
+                f"Ryuu API key: {'set' if key else 'NOT set'}\n\n"
+                "Ryuu does not expose usage stats over the documented API.\n"
+                "Use 'Set Ryuu key\u2026' to update the key."
+            )
+        elif self.stats_error:
             text = f"\u274c {self.stats_error}"
         elif self.stats_cache is None:
             text = "No data yet \u2014 try 'Refresh stats'."
         else:
             text = hubcap.stats_detail_text(self.stats_cache, None)
         try:
-            messagebox.showinfo("Hubcap stats", text)
+            messagebox.showinfo("Manifest source stats", text)
         except tk.TclError:
             pass
 
-    # ------------------------------------------------------------------ menu actions
     def _set_tool(self, _icon, item):
-        self.cfg["tool"] = item.text
-        save_config(self.cfg)
+        cfg = load_config()
+        cfg["tool"] = item.text
+        save_config(cfg)
+        self.cfg = cfg
+        self._rebuild_menu()
+
+    def _set_source(self, _icon, item):
+        cfg = load_config()
+        cfg["manifest_source"] = item.text.lower()
+        save_config(cfg)
+        self.cfg = cfg
+        self._notify("Manifest source", f"Switched to {item.text}")
+        self._rebuild_menu()
+        self.events.put(("refresh_stats", None))
+
+    def _toggle_fallback(self, _icon, _item):
+        cfg = load_config()
+        cfg["fallback_enabled"] = not cfg.get("fallback_enabled", False)
+        save_config(cfg)
+        self.cfg = cfg
+        self._notify(
+            "Fallback",
+            f"Fallback {'enabled' if cfg['fallback_enabled'] else 'disabled'}",
+        )
         self._rebuild_menu()
 
     def _set_hubcap_key(self, _icon=None, _item=None):
@@ -473,12 +570,34 @@ class SteamTrayApp:
         if hubcap.save_hubcap_key(key.strip()):
             self._notify("Hubcap key saved", "Refreshing stats\u2026")
             self._rebuild_menu()
-            self._notify("Complete", "Stats refreshed successfully")
             self.stats_cache = None
             self.stats_error = None
             self.events.put(("refresh_stats", None))
         else:
             self._notify("Save failed", "Could not write the key file.")
+
+    def _set_ryuu_key(self, _icon=None, _item=None):
+        current = ryuu.load_ryuu_key()
+
+        self.root.update_idletasks()
+        try:
+            key = simpledialog.askstring(
+                "Ryuu API key",
+                "Enter your Ryuu API key (sent as X-Auth-Key).\n"
+                "Stored in config.json",
+                initialvalue=current, show="\u2022",
+            )
+        except tk.TclError as e:
+            print('tk error', e)
+            return
+        if not key:
+            return
+        if ryuu.save_ryuu_key(key.strip()):
+            self.cfg = load_config()
+            self._notify("Ryuu key saved", "You can now apply manifests from Ryuu.")
+            self._rebuild_menu()
+        else:
+            self._notify("Save failed", "Could not write the key.")
 
     def _enable_debugging(self, _icon=None, _item=None):
         ok, msg = enable_cef_debugging()
@@ -515,7 +634,6 @@ class SteamTrayApp:
             os._exit(0)
 
     def _shutdown(self):
-        # Stop the CEF poller first so it can't re-enter anything.
         if self.monitor:
             try:
                 self.monitor.stop()
