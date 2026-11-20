@@ -47,7 +47,8 @@ Open the tray menu and pick the tool you'll be using under **Apply tool**:
 
 <br>
 
-<img width="524" height="409" alt="image" src="https://github.com/user-attachments/assets/1164acae-b28c-4152-b1ce-fde6f9b8e814" />
+<img width="480" height="430" alt="image" src="https://github.com/user-attachments/assets/7561d973-cb84-45e5-88ce-988d957e4fa8" />
+
 
 <br>
 <br>
