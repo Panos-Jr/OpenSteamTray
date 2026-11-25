@@ -67,13 +67,16 @@ Selecting **Ryuu OpenSteamTool** as the tool overrides this and always uses Ryuu
 
 <br>
 
-## 4. (Optional) Turn on Fallback
+## 4. (Optional but useful) Turn on Fallback
 
 If the current tool + source combo fails (game not found, API error, etc.), Fallback tries the other combination automatically — then returns to your original selection. Toggle it from the tray menu:
 
 **Fallback on failure: ON / OFF**
 
 Useful if a game exists on one source but not the other.
+
+If you have it enabled and say one source fails, if the other one works, you should see the game in your library.
+
 
 <br>
 
