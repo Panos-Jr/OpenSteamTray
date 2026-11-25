@@ -135,6 +135,6 @@ If a game is excluded, or the game is delisted and you can't access it in the St
 
 # Notes
 
-- **No restart needed** when using **Ryuu OpenSteamTool** — OpenSteamTool reloads `.lua` files live.
-- With Hubcap or Steamtools, Steam must be restarted for the new game to appear (the app will prompt, or you can enable auto-restart).
+- **No restart needed** when using **Ryuu OpenSteamTool** — it reloads `.lua` files live.
+- With Standard OpenSteamTool or Steamtools, Steam must be restarted for the new game to appear (the app will prompt, or you can enable auto-restart).
 - If a Ryuu download returns 404, the app automatically fires `/requestupdate` and `/request` for that App ID, waits a few seconds, and retries once. Some games may need a minute before they're available.
